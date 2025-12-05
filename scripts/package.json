@@ -1,0 +1,14 @@
+{
+  "name": "casperflow-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Deployment and utility scripts for CasperFlow",
+  "scripts": {
+    "deploy": "node deploy.js",
+    "deploy:testnet": "NODE_URL=https://node.testnet.casper.network/rpc CHAIN_NAME=casper-test node deploy.js",
+    "deploy:mainnet": "NODE_URL=https://node.mainnet.casper.network/rpc CHAIN_NAME=casper node deploy.js"
+  },
+  "dependencies": {
+    "casper-js-sdk": "^5.0.6"
+  }
+}
