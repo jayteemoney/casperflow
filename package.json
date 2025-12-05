@@ -1,0 +1,25 @@
+{
+  "name": "casperflow",
+  "version": "1.0.0",
+  "description": "Enterprise-grade P2P remittance platform on Casper Network",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "scripts"
+  ],
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "build:contract": "cd contracts && make build",
+    "test:contract": "cd contracts && make test",
+    "clean": "cd contracts && make clean"
+  },
+  "keywords": [
+    "casper",
+    "blockchain",
+    "remittance",
+    "defi",
+    "web3"
+  ],
+  "author": "CasperFlow Team",
+  "license": "MIT"
+}
