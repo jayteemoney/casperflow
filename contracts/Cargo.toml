@@ -1,0 +1,23 @@
+[package]
+name = "casperflow-escrow"
+version = "1.0.0"
+edition = "2021"
+authors = ["CasperFlow Team"]
+description = "Enterprise-grade P2P remittance platform on Casper Network"
+license = "MIT"
+
+[dependencies]
+casper-contract = "5.1"
+casper-types = "6.1"
+
+[dev-dependencies]
+casper-engine-test-support = "8.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
