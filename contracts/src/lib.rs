@@ -39,6 +39,9 @@
 
 extern crate alloc;
 
+use alloc::string::{String, ToString};
+use alloc::vec;
+
 mod entry_points;
 mod errors;
 mod events;
@@ -48,8 +51,8 @@ mod utils;
 
 use casper_contract::contract_api::{runtime, storage as contract_storage};
 use casper_types::{
-    contracts::NamedKeys, entry_point::EntryPoints, CLType, EntryPoint, EntryPointAccess,
-    EntryPointType, Parameter,
+    contracts::NamedKeys, CLType, EntryPoint, EntryPointAccess,
+    EntryPointType, EntryPoints, Parameter,
 };
 
 /// Contract entry point: create_remittance

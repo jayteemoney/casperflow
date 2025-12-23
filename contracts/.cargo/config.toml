@@ -1,0 +1,39 @@
+# Cargo configuration for CasperFlow contract builds
+# This file configures network retry settings and other build options
+
+[net]
+# Increase retry attempts for network operations
+retry = 5
+
+# Use git CLI for fetching (helps with some auth/network issues)
+git-fetch-with-cli = true
+
+# Offline mode - uncomment to use only cached crates
+# offline = true
+
+[http]
+# Disable SSL certificate revocation checks
+# This can help with some firewall/antivirus issues
+check-revoke = false
+
+# Increase timeouts for slow connections
+timeout = 60
+
+[build]
+# Build for WASM target
+target = "wasm32-unknown-unknown"
+
+# Use incremental compilation for faster builds
+incremental = true
+
+[profile.release]
+# Optimize for size (important for blockchain contracts)
+opt-level = "z"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[target.wasm32-unknown-unknown]
+# WASM-specific optimizations
+rustflags = ["-C", "link-arg=-s"]

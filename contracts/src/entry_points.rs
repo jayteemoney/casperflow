@@ -3,11 +3,15 @@
 //! This module implements all public functions that can be called
 //! to interact with the contract.
 
+extern crate alloc;
+
+use alloc::string::String;
+
 use casper_contract::{
     contract_api::runtime,
     unwrap_or_revert::UnwrapOrRevert,
 };
-use casper_types::{account::AccountHash, U512};
+use casper_types::{account::AccountHash, CLValue, U512};
 
 use crate::{
     errors::{Error, MAX_PURPOSE_LENGTH},
@@ -91,7 +95,7 @@ pub fn create_remittance_entry() {
     .emit();
 
     // Return remittance ID
-    runtime::ret(remittance_id);
+    runtime::ret(CLValue::from_t(remittance_id).unwrap_or_revert());
 }
 
 /// Contributes funds to an existing remittance.
@@ -369,7 +373,7 @@ pub fn claim_refund_entry() {
 pub fn get_remittance_entry() {
     let remittance_id: u64 = runtime::get_named_arg("remittance_id");
     let remittance = storage::get_remittance(remittance_id).unwrap_or_revert();
-    runtime::ret(remittance);
+    runtime::ret(CLValue::from_t(remittance).unwrap_or_revert());
 }
 
 /// Gets contribution amount for a specific contributor.
@@ -378,7 +382,7 @@ pub fn get_contribution_entry() {
     let contributor: AccountHash = runtime::get_named_arg("contributor");
 
     let amount = storage::get_contribution(remittance_id, contributor);
-    runtime::ret(amount);
+    runtime::ret(CLValue::from_t(amount).unwrap_or_revert());
 }
 
 /// Checks if a refund has been claimed.
@@ -387,13 +391,13 @@ pub fn is_refund_claimed_entry() {
     let contributor: AccountHash = runtime::get_named_arg("contributor");
 
     let claimed = storage::is_refund_claimed(remittance_id, contributor);
-    runtime::ret(claimed);
+    runtime::ret(CLValue::from_t(claimed).unwrap_or_revert());
 }
 
 /// Gets the current platform fee in basis points.
 pub fn get_platform_fee_entry() {
     let fee_bps = storage::get_platform_fee_bps();
-    runtime::ret(fee_bps);
+    runtime::ret(CLValue::from_t(fee_bps).unwrap_or_revert());
 }
 
 // ============================================================================

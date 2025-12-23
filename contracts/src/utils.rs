@@ -47,8 +47,10 @@ pub fn get_caller() -> AccountHash {
         CallStackElement::StoredContract { contract_hash, .. } => {
             // If called by another contract, use the contract hash as bytes
             // Convert contract_hash to account_hash representation
-            AccountHash::from_formatted_str(&contract_hash.to_formatted_string())
-                .unwrap_or_revert_with(Error::InvalidAccountHash)
+            match AccountHash::from_formatted_str(&contract_hash.to_formatted_string()) {
+                Ok(account_hash) => account_hash,
+                Err(_) => runtime::revert(Error::InvalidAccountHash),
+            }
         }
     }
 }
@@ -107,6 +109,7 @@ pub fn transfer_cspr(
         amount,
         None,
     )
+    .map(|_| ()) // Discard TransferredTo and return ()
     .map_err(|_| Error::TransferFailed)
 }
 

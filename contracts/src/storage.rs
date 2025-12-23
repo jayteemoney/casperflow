@@ -3,6 +3,12 @@
 //! This module handles all contract storage operations using Casper's
 //! dictionary-based storage pattern for gas efficiency.
 
+extern crate alloc;
+
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+
 use casper_contract::{
     contract_api::{runtime, storage},
     unwrap_or_revert::UnwrapOrRevert,

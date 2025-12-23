@@ -3,7 +3,13 @@
 //! This module defines the Remittance and Contribution types that represent
 //! the core business logic of the platform.
 
+extern crate alloc;
+
+use alloc::string::String;
+
 use casper_types::{account::AccountHash, U512};
+use casper_types::bytesrepr::{FromBytes, ToBytes};
+use casper_types::CLTyped;
 
 /// Represents a single remittance request with escrow functionality.
 ///
@@ -106,6 +112,72 @@ impl Remittance {
 
         let percentage = (current_u64.saturating_mul(100)) / target_u64;
         percentage.min(100)
+    }
+}
+
+// Manual implementations of serialization traits for Remittance
+impl ToBytes for Remittance {
+    fn to_bytes(&self) -> Result<alloc::vec::Vec<u8>, casper_types::bytesrepr::Error> {
+        let mut result = alloc::vec::Vec::new();
+        result.append(&mut self.id.to_bytes()?);
+        result.append(&mut self.creator.to_bytes()?);
+        result.append(&mut self.recipient.to_bytes()?);
+        result.append(&mut self.target_amount.to_bytes()?);
+        result.append(&mut self.current_amount.to_bytes()?);
+        result.append(&mut self.purpose.to_bytes()?);
+        result.append(&mut self.created_at.to_bytes()?);
+        result.append(&mut self.is_released.to_bytes()?);
+        result.append(&mut self.is_cancelled.to_bytes()?);
+        Ok(result)
+    }
+
+    fn serialized_length(&self) -> usize {
+        self.id.serialized_length()
+            + self.creator.serialized_length()
+            + self.recipient.serialized_length()
+            + self.target_amount.serialized_length()
+            + self.current_amount.serialized_length()
+            + self.purpose.serialized_length()
+            + self.created_at.serialized_length()
+            + self.is_released.serialized_length()
+            + self.is_cancelled.serialized_length()
+    }
+}
+
+impl FromBytes for Remittance {
+    fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), casper_types::bytesrepr::Error> {
+        let (id, remainder) = u64::from_bytes(bytes)?;
+        let (creator, remainder) = AccountHash::from_bytes(remainder)?;
+        let (recipient, remainder) = AccountHash::from_bytes(remainder)?;
+        let (target_amount, remainder) = U512::from_bytes(remainder)?;
+        let (current_amount, remainder) = U512::from_bytes(remainder)?;
+        let (purpose, remainder) = String::from_bytes(remainder)?;
+        let (created_at, remainder) = u64::from_bytes(remainder)?;
+        let (is_released, remainder) = bool::from_bytes(remainder)?;
+        let (is_cancelled, remainder) = bool::from_bytes(remainder)?;
+
+        Ok((
+            Remittance {
+                id,
+                creator,
+                recipient,
+                target_amount,
+                current_amount,
+                purpose,
+                created_at,
+                is_released,
+                is_cancelled,
+            },
+            remainder,
+        ))
+    }
+}
+
+impl CLTyped for Remittance {
+    fn cl_type() -> casper_types::CLType {
+        // Represent as a tuple of all fields
+        use casper_types::CLType;
+        CLType::Any // Using Any for complex custom types
     }
 }
 

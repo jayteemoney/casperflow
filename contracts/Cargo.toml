@@ -7,11 +7,11 @@ description = "Enterprise-grade P2P remittance platform on Casper Network"
 license = "MIT"
 
 [dependencies]
-casper-contract = "5.1"
-casper-types = "6.1"
+casper-contract = "4.0"
+casper-types = "4.0"
 
 [dev-dependencies]
-casper-engine-test-support = "8.1"
+casper-engine-test-support = "4.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

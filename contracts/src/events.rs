@@ -3,6 +3,11 @@
 //! This module handles event logging using Casper's CEP-88 event standard
 //! for efficient on-chain event tracking.
 
+extern crate alloc;
+
+use alloc::string::String;
+use alloc::vec;
+
 use casper_contract::contract_api::runtime;
 use casper_types::{account::AccountHash, U512};
 
@@ -71,128 +76,38 @@ impl ContractEvent {
     ///
     /// Events are recorded in the contract's execution effects and can be
     /// queried by clients for real-time updates.
+    ///
+    /// Note: In SDK 4.0, we use runtime::print for event logging.
+    /// For production use with SDK 5.x+, replace with CEP-88 events.
     pub fn emit(&self) {
+        // Event emission is simplified for SDK 4.0 compatibility
+        // In production with SDK 5.x+, use proper CEP-88 event standard
+        // For now, events are logged for debugging purposes only
+        #[cfg(feature = "debug-events")]
         match self {
-            ContractEvent::RemittanceCreated {
-                remittance_id,
-                creator,
-                recipient,
-                target_amount,
-                purpose,
-                timestamp,
-            } => {
-                runtime::emit_event(
-                    "RemittanceCreated",
-                    vec![
-                        ("remittance_id", remittance_id.to_string()),
-                        ("creator", creator.to_string()),
-                        ("recipient", recipient.to_string()),
-                        ("target_amount", target_amount.to_string()),
-                        ("purpose", purpose.clone()),
-                        ("timestamp", timestamp.to_string()),
-                    ],
-                );
+            ContractEvent::RemittanceCreated { remittance_id, .. } => {
+                runtime::print(&alloc::format!("RemittanceCreated: {}", remittance_id));
             }
-
-            ContractEvent::ContributionMade {
-                remittance_id,
-                contributor,
-                amount,
-                new_total,
-                timestamp,
-            } => {
-                runtime::emit_event(
-                    "ContributionMade",
-                    vec![
-                        ("remittance_id", remittance_id.to_string()),
-                        ("contributor", contributor.to_string()),
-                        ("amount", amount.to_string()),
-                        ("new_total", new_total.to_string()),
-                        ("timestamp", timestamp.to_string()),
-                    ],
-                );
+            ContractEvent::ContributionMade { remittance_id, amount, .. } => {
+                runtime::print(&alloc::format!("ContributionMade: {} - {}", remittance_id, amount));
             }
-
-            ContractEvent::FundsReleased {
-                remittance_id,
-                recipient,
-                amount,
-                platform_fee,
-                timestamp,
-            } => {
-                runtime::emit_event(
-                    "FundsReleased",
-                    vec![
-                        ("remittance_id", remittance_id.to_string()),
-                        ("recipient", recipient.to_string()),
-                        ("amount", amount.to_string()),
-                        ("platform_fee", platform_fee.to_string()),
-                        ("timestamp", timestamp.to_string()),
-                    ],
-                );
+            ContractEvent::FundsReleased { remittance_id, amount, .. } => {
+                runtime::print(&alloc::format!("FundsReleased: {} - {}", remittance_id, amount));
             }
-
-            ContractEvent::RemittanceCancelled {
-                remittance_id,
-                creator,
-                total_amount,
-                timestamp,
-            } => {
-                runtime::emit_event(
-                    "RemittanceCancelled",
-                    vec![
-                        ("remittance_id", remittance_id.to_string()),
-                        ("creator", creator.to_string()),
-                        ("total_amount", total_amount.to_string()),
-                        ("timestamp", timestamp.to_string()),
-                    ],
-                );
+            ContractEvent::RemittanceCancelled { remittance_id, .. } => {
+                runtime::print(&alloc::format!("RemittanceCancelled: {}", remittance_id));
             }
-
-            ContractEvent::RefundClaimed {
-                remittance_id,
-                contributor,
-                amount,
-                timestamp,
-            } => {
-                runtime::emit_event(
-                    "RefundClaimed",
-                    vec![
-                        ("remittance_id", remittance_id.to_string()),
-                        ("contributor", contributor.to_string()),
-                        ("amount", amount.to_string()),
-                        ("timestamp", timestamp.to_string()),
-                    ],
-                );
+            ContractEvent::RefundClaimed { remittance_id, contributor, .. } => {
+                runtime::print(&alloc::format!("RefundClaimed: {} - {}", remittance_id, contributor));
             }
-
-            ContractEvent::PlatformFeeUpdated {
-                old_fee_bps,
-                new_fee_bps,
-                timestamp,
-            } => {
-                runtime::emit_event(
-                    "PlatformFeeUpdated",
-                    vec![
-                        ("old_fee_bps", old_fee_bps.to_string()),
-                        ("new_fee_bps", new_fee_bps.to_string()),
-                        ("timestamp", timestamp.to_string()),
-                    ],
-                );
+            ContractEvent::PlatformFeeUpdated { new_fee_bps, .. } => {
+                runtime::print(&alloc::format!("PlatformFeeUpdated: {}", new_fee_bps));
             }
-
-            ContractEvent::ContractPaused { timestamp } => {
-                runtime::emit_event(
-                    "ContractPaused",
-                    vec![("timestamp", timestamp.to_string())],
-                );
+            ContractEvent::ContractPaused { .. } => {
+                runtime::print("ContractPaused");
             }
-
-            ContractEvent::ContractUnpaused { timestamp } => {
-                runtime::emit_event(
-                    "ContractUnpaused",
-                    vec![("timestamp", timestamp.to_string())],
-                );
+            ContractEvent::ContractUnpaused { .. } => {
+                runtime::print("ContractUnpaused");
             }
         }
     }
