@@ -4,11 +4,19 @@
   "type": "module",
   "description": "Deployment and utility scripts for CasperFlow",
   "scripts": {
-    "deploy": "node deploy.js",
-    "deploy:testnet": "NODE_URL=https://node.testnet.casper.network/rpc CHAIN_NAME=casper-test node deploy.js",
-    "deploy:mainnet": "NODE_URL=https://node.mainnet.casper.network/rpc CHAIN_NAME=casper node deploy.js"
+    "deploy": "tsx deploy.ts",
+    "deploy:testnet": "NODE_URL=https://node.testnet.casper.network/rpc CHAIN_NAME=casper-test tsx deploy.ts",
+    "deploy:mainnet": "NODE_URL=https://node.mainnet.casper.network/rpc CHAIN_NAME=casper tsx deploy.ts"
   },
   "dependencies": {
-    "casper-js-sdk": "^5.0.6"
+    "bip39": "^3.1.0",
+    "casper-js-sdk": "^2.15.4",
+    "ethereumjs-wallet": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
