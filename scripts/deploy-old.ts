@@ -2,7 +2,7 @@
  * Deployment script for CasperFlow contract
  *
  * Usage:
- *   node scripts/deploy.js
+ *   tsx scripts/deploy.ts
  *
  * Environment variables required:
  *   NODE_URL - Casper node RPC URL
@@ -10,7 +10,8 @@
  *   SECRET_KEY_PATH - Path to secret key PEM file
  */
 
-import { CasperClient, CLPublicKey, DeployUtil, Signer } from 'casper-js-sdk';
+import CasperSDK from 'casper-js-sdk';
+const { CasperClient, CLPublicKey, DeployUtil, Keys, RuntimeArgs } = CasperSDK;
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -58,7 +59,7 @@ async function main() {
     // Load keys
     console.log('📂 Loading keys...');
     const privateKey = fs.readFileSync(SECRET_KEY_PATH, 'utf8');
-    const publicKeyPath = SECRET_KEY_PATH.replace('secret_key', 'public_key_hex');
+    const publicKeyPath = SECRET_KEY_PATH.replace('secret_key.pem', 'public_key_hex');
     const publicKeyHex = fs.readFileSync(publicKeyPath, 'utf8').trim();
     const publicKey = CLPublicKey.fromHex(publicKeyHex);
 
@@ -77,14 +78,15 @@ async function main() {
       new DeployUtil.DeployParams(publicKey, CHAIN_NAME),
       DeployUtil.ExecutableDeployItem.newModuleBytes(
         wasm,
-        DeployUtil.RuntimeArgs.fromMap({})
+        RuntimeArgs.fromMap({})
       ),
       DeployUtil.standardPayment(DEPLOYMENT_GAS)
     );
 
     // Sign deploy
     console.log('✍️  Signing deploy...');
-    const signedDeploy = DeployUtil.signDeploy(deploy, privateKey);
+    const keyPair = Keys.Ed25519.parsePrivateKey(Keys.Ed25519.readBase64WithPEM(privateKey));
+    const signedDeploy = deploy.sign([keyPair]);
     const deployHash = DeployUtil.deployToJson(signedDeploy).deploy.hash;
 
     console.log(`   Deploy Hash: ${deployHash}`);
@@ -145,7 +147,7 @@ async function main() {
   }
 }
 
-async function waitForDeploy(client, deployHash, timeout = 180000) {
+async function waitForDeploy(client: any, deployHash: string, timeout: number = 180000): Promise<any> {
   const startTime = Date.now();
   let attempts = 0;
 
@@ -187,7 +189,7 @@ async function waitForDeploy(client, deployHash, timeout = 180000) {
   throw new Error('Deploy timeout - transaction not finalized within expected time');
 }
 
-function extractContractHash(result) {
+function extractContractHash(result: any): string | null {
   try {
     const transforms = result.result.Success.effect.transforms;
 
